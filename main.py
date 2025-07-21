@@ -230,6 +230,10 @@ def get_details(url: str = Query(...)):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+@app.get("/")
+def helloworld():
+    return {"message": "halooooo"}
+
 
 @app.get("/cron/notify")
 def cron_notify(category: str = Query("contest"), webhook: str = Query(...)):
@@ -237,7 +241,19 @@ def cron_notify(category: str = Query("contest"), webhook: str = Query(...)):
         seen = load_seen_contests()
         new_seen = seen.copy()
 
-        def make_url(page): return f"https://www.camphub.in.th/{category}/" + (f"page/{page}/" if page > 1 else "")
+        def make_url(page):
+            base = f"https://www.camphub.in.th/"
+            if type == "type":
+                return f"{base}type/{category}/" + (f"page/{page}/" if page > 1 else "")
+            elif type == "tag":
+                return f"{base}tag/{category}/" + (f"page/{page}/" if page > 1 else "")
+            elif type == "medical":
+                return f"{base}medical-health/{category}/" + (f"page/{page}/" if page > 1 else "")
+            elif type == "private":
+                return f"{base}private-university/" + (f"page/{page}/" if page > 1 else "")
+            else:
+                return f"{base}{category}/" + (f"page/{page}/" if page > 1 else "")
+        
         contests = scrape_contests(make_url)
 
         new_contests = []
